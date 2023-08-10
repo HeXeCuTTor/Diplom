@@ -1,0 +1,100 @@
+# примеры API-запросов
+
+@baseUrl = http://127.0.0.1:8000/api/v1
+
+# получение магазинов
+GET {{baseUrl}}/shops
+Content-Type: application/json
+
+###
+
+# создание пользователя
+POST {{baseUrl}}/user/register
+Content-Type: application/json
+
+{
+  "username": "vers",
+  "first_name": "CLOSED",
+  "last_name":"check",
+  "email":"agh7gehf9@gmail.com",
+  "password":"che11ck",
+  "age": 67,
+  "company":"check",
+  "position": 7678
+}
+
+###
+
+# вход
+POST {{baseUrl}}/user/login
+Content-Type: application/json
+
+{
+  "email":"agh7gehf9@gmail.com",
+  "password":"che11ck"
+}
+
+###
+
+#получение данных аккаунта
+GET {{baseUrl}}/user/detail_account
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+###
+
+#редактирование данных аккаунта
+POST {{baseUrl}}/user/detail_account
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "email":"agh7gehf9@gmail.com",
+  "age":"55"
+}
+###
+
+#получение контактов
+GET {{baseUrl}}/user/contacts
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+###
+
+#редактирование контакта
+PATCH {{baseUrl}}/user/contacts
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "phone":"+34234234",
+  "id": 14
+}
+
+###
+
+#удаление контакта
+DELETE {{baseUrl}}/user/contacts
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "id": 13
+}
+###
+
+#Добавление контакта
+POST {{baseUrl}}/user/contacts
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "city": "hfhfh",
+  "house": "hhgerg",
+  "street": "qweqwed",
+  "structure": "12123",
+  "building": "2424",
+  "apartment": "46623",
+  "phone":"+34234234",
+}
+
+###
