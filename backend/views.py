@@ -153,9 +153,9 @@ class ProductInfoView(APIView):
         return Response(product_serializer.data)
     
     def post(self,request,*args,**kwargs):
-        if not request.user.is_authenticated or request.user.type == 'buyer':
+        if not request.user.is_authenticated or request.user.type != 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)        
-        elif {'product_info', 'quantity'}.issubset(request.data):            
+        elif {'product', 'shop'}.issubset(request.data):        
             serializer = ProductInfoSerializer(data=request.data, partial = True)
             if serializer.is_valid():
                 serializer.save()
@@ -166,7 +166,7 @@ class ProductInfoView(APIView):
             return JsonResponse({"Status": False, "Errors": 'Not all arguments'})
 
     def patch(self,request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.type == 'buyer':
+        if not request.user.is_authenticated or request.user.type != 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
         shop = Shop.objects.filter(id=request.data['shop_id'])
         shop_serializer = ShopSerializer(shop, many = True)

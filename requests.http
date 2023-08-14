@@ -172,7 +172,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
 
-#обновление инфо товара
+#удаление товара
 DELETE {{baseUrl}}/product/info
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
@@ -211,7 +211,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 {
 
 "id": 1, 
-"quantity": 34
+"quantity": 22
 
 }
 
