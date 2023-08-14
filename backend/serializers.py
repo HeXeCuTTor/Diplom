@@ -16,13 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
 class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ('id', 'name', 'status', 'url',)
+        fields = ('id', 'name', 'status', 'url', 'user_id',)
         read_only_fields = ('id',)
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = ('id', 'name',)
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
@@ -45,7 +45,7 @@ class ProductParameterSerializer(serializers.ModelSerializer):
         fields = ('parameter', 'value',)
 
 class ProductInfoSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only = True)
+    product = ProductSerializer(read_only=True)
     product_parameters = ProductParameterSerializer(read_only=True, many=True)
 
     class Meta:
@@ -67,7 +67,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'ordered_items', 'status', 'creation_time', 'contact',)
+        fields = ('id', 'ordered_items', 'status', 'creation_time', 'contact', 'user',)
         read_only_fields = ('id',)    
 
 

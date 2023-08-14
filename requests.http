@@ -2,9 +2,41 @@
 
 @baseUrl = http://127.0.0.1:8000/api/v1
 
+# получение категорий
+GET {{baseUrl}}/categories
+Content-Type: application/json
+
+###
+
+
+# добавление категорий
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "name": "electronics"
+}
+
+###
+
 # получение магазинов
 GET {{baseUrl}}/shops
 Content-Type: application/json
+
+###
+
+
+# добавление магазинов
+POST {{baseUrl}}/shops
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "name": "cool shop",
+  "url": "http://check.com",
+  "status": "active"
+}
 
 ###
 
@@ -95,6 +127,104 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
   "building": "2424",
   "apartment": "46623",
   "phone":"+34234234",
+}
+
+###
+
+#добавление инфо товара
+POST {{baseUrl}}/product/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "model": "Nokia",
+  "info_id": "3",
+  "quantity": "33",
+  "price": "3333",
+  "price_rrc": "3444",
+  "product": 1,
+  "shop": 1
+}
+###
+
+#получение инфо о товаре
+GET {{baseUrl}}/product/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "product_id": 1,
+  "shop_id": 1
+}
+
+###
+
+#обновление инфо товара
+PATCH {{baseUrl}}/product/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "product_info_id": 25,
+  "shop_id": 1,
+  "product": "1"
+}
+
+###
+
+#обновление инфо товара
+DELETE {{baseUrl}}/product/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "id": 1,
+  "shop_id": 1
+}
+
+###
+# добавление товара в корзину
+POST {{baseUrl}}/basket/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+
+"product_info_id": 25, 
+"quantity": 25
+
+}
+
+###
+
+# просмотр корзины
+GET {{baseUrl}}/basket/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+###
+# редактирование корзины
+PATCH  {{baseUrl}}/basket/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+
+"id": 1, 
+"quantity": 34
+
+}
+
+###
+# удаление товара из корзины
+DELETE  {{baseUrl}}/basket/info
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+
+"id": 23
+
 }
 
 ###
