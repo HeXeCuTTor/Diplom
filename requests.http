@@ -40,6 +40,20 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
 
+
+# изменение магазина
+PATCH {{baseUrl}}/shops
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "id": 2,
+  "name": "cool shop",
+  "url": "http://check.ru"
+}
+
+###
+
 # создание пользователя
 POST {{baseUrl}}/user/register
 Content-Type: application/json
@@ -142,7 +156,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
   "quantity": "33",
   "price": "3333",
   "price_rrc": "3444",
-  "product": 1,
+  "product": "1",
   "shop": 1
 }
 ###

@@ -87,7 +87,7 @@ class CategoryView(APIView):
 class ShopView(APIView):
     def get(self, request, *args, **kwargs):
         shop = Shop.objects.all()           
-        serializer = CategorySerializer(shop, many=True)
+        serializer = ShopSerializer(shop, many=True)
         return Response(serializer.data)
     
     def post(self,request, *args, **kwargs):
@@ -95,6 +95,17 @@ class ShopView(APIView):
             return JsonResponse({'Status': False, 'Error': 'Not Allowed'}, status=403) 
         request.data.update({'user_id': request.user.id})     
         serializer = ShopSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({'Status': True})
+        else:
+            return JsonResponse({'Status': False, 'Errors': serializer.errors})
+        
+    def patch(self,request, *args, **kwargs):
+        if not request.user.is_authenticated and request.user.type != 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not Allowed'}, status=403) 
+        shop = Shop.objects.filter(id=request.data['id']).first()    
+        serializer = ShopSerializer(shop, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse({'Status': True})
