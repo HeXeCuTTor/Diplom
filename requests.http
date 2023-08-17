@@ -47,9 +47,10 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "id": 2,
-  "name": "cool shop",
-  "url": "http://check.ru"
+  "id": 27,
+  "name": "coouul shop",
+  "url": "http://check.ru",
+  "user": 13
 }
 
 ###
@@ -134,13 +135,13 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "city": "hfhfh",
+  "city": "uoooooo",
   "house": "hhgerg",
   "street": "qweqwed",
   "structure": "12123",
   "building": "2424",
   "apartment": "46623",
-  "phone":"+34234234",
+  "phone":"+34234234"
 }
 
 ###
@@ -151,13 +152,13 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "model": "Nokia",
-  "info_id": "3",
-  "quantity": "33",
-  "price": "3333",
-  "price_rrc": "3444",
-  "product": "1",
-  "shop": 1
+"model": "Siemens",
+"info_id": 4,
+"product": 1,
+"shop": 27,
+"quantity": 6576,
+"price": 98878,
+"price_rrc": 80000
 }
 ###
 
@@ -168,7 +169,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
   "product_id": 1,
-  "shop_id": 1
+  "shop_id": 27
 }
 
 ###
@@ -179,9 +180,10 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "product_info_id": 25,
-  "shop_id": 1,
-  "product": "1"
+  "product_info_id": 63,
+  "shop": 27,
+  "product": 1,
+  "info_id": 6
 }
 
 ###
@@ -192,8 +194,8 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "id": 1,
-  "shop_id": 1
+  "id": 64,
+  "shop": 27
 }
 
 ###
@@ -204,8 +206,8 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
 
-"product_info_id": 25, 
-"quantity": 25
+"product_info": 63, 
+"quantity": 44
 
 }
 
@@ -217,15 +219,15 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
-# редактирование корзины
+# редактирование корзины/подтверждение заказа
 PATCH  {{baseUrl}}/basket/info
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
 
-"id": 1, 
-"quantity": 22
+"id": 25, 
+"quantity": 4444
 
 }
 
@@ -237,7 +239,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
 
-"id": 23
+"id": 46
 
 }
 
