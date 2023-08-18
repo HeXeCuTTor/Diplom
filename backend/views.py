@@ -7,10 +7,10 @@ from django.contrib.auth import authenticate
 from django.db.models import Sum, F
 from django.utils import timezone
 
-from backend.models import Shop, Category, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
+from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
-    OrderItemSerializer, OrderSerializer, ContactSerializer
+    OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
 from info import SALT
 
 class RegisterUser(APIView):
@@ -69,18 +69,11 @@ class CategoryView(APIView):
         return Response(serializer.data)
     
     def post(self,request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
-        if Category.objects.get(name=request.data["name"]) is True:        
-            serializer = CategorySerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse({'Status': True})
-            else:
-                return JsonResponse({'Status': False, 'Errors': serializer.errors})
-        else:
-            return JsonResponse({"Status": False, "Errors": "Already exist"})     
-    
+        Category.objects.get_or_create(name=request.data["name"])       
+        return JsonResponse({'Status': True})
+  
 
 class ShopView(APIView):
     #done!!!
@@ -167,6 +160,17 @@ class ContactView(APIView):
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': False, 'Errors': serializer.errors})
+class ProductView(APIView):
+    def get(self, request, *args, **kwargs):
+        product = Product.objects.all()           
+        serializer = ProductSerializer(product, many=True)
+        return Response(serializer.data)
+    
+    def post(self,request, *args, **kwargs):
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
+        Product.objects.get_or_create(name=request.data["name"], category_id=request.data['category_id'])       
+        return JsonResponse({'Status': True}) 
 
 class ProductInfoView(APIView): 
     #done!!!!

@@ -1,11 +1,12 @@
 from django.urls import path
 
 from backend.views import RegisterUser,LogInUser, DetailAccount, CategoryView, ShopView, ContactView, ProductInfoView, \
-    OrdersView
+    OrdersView, ProductView
 
 app_name = 'backend'
 urlpatterns = [
     path('categories', CategoryView.as_view(), name='categories'),
+    path('products', ProductView.as_view(), name='products'),
     path('shops', ShopView.as_view(), name='shops'),
     path('user/register', RegisterUser.as_view(), name='register'),
     path('user/login', LogInUser.as_view(), name='login'),

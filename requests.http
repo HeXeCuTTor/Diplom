@@ -15,7 +15,26 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "name": "electronics"
+  "name": "tank"
+}
+
+###
+
+# получение товара
+GET {{baseUrl}}/products
+Content-Type: application/json
+
+###
+
+
+# добавление товара
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+
+{
+  "category_id": 1,
+  "name": "Acer"
 }
 
 ###
