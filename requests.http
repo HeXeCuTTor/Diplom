@@ -83,8 +83,8 @@ Content-Type: application/json
   "username": "vwwwers",
   "first_name": "CLOSED",
   "last_name":"check",
-  "email":"agh7gerrr9@gmail.com",
-  "password":"che11ck",
+  "email":"ilyavoloshin20@gmail.com",
+  "password":"che11ckuuu",
   "age": 67,
   "company":"check",
   "position": 7678
@@ -97,8 +97,9 @@ POST {{baseUrl}}/user/login
 Content-Type: application/json
 
 {
-  "email":"agh7gehuuuf9@gmail.com",
-  "password":"che11ck"
+"email":"ilyavoloshin20@gmail.com",
+"password": "fkwjfjwfjwefwef11"
+
 }
 
 ###
@@ -118,7 +119,7 @@ Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
 
 {
   "username": "stars",
-  "email":"agh7gehuuuf9@gmail.com",
+  "email":"oooio0@gmail.com",
   "age":"55"
 }
 ###
@@ -161,7 +162,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 #Добавление контакта
 POST {{baseUrl}}/user/contacts
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
 
 {
   "city": "uoooooo",
@@ -253,13 +254,13 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 # редактирование корзины/подтверждение заказа
 PATCH  {{baseUrl}}/orders
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
 
 {
 
-"id": 50, 
-"contact": 18,
-"product_info": 63
+"id": 1, 
+"contact": 1,
+"product_info": 1
 
 }
 
@@ -276,3 +277,26 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 }
 
 ###
+
+GET {{baseUrl}}/user/recovery_password
+Content-Type: application/json
+
+{
+
+"email":"ilyavoloshin20@gmail.com"
+
+}
+
+###
+
+POST {{baseUrl}}/user/recovery_password
+Content-Type: application/json
+
+{
+
+"token": "ef34322e266e542b2e",
+"email":"ilyavoloshin20@gmail.com",
+"password": "fkwjfjwfjwefwef11",
+"first_name": "Iutrrrrrrhrg"
+
+}

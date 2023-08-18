@@ -1,26 +1,33 @@
-from django.shortcuts import render
+from django.contrib.auth.password_validation import validate_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
 from django.db.models import Sum, F
-from django.utils import timezone
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
-    Contact
+from backend.models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
+    Contact, ResetEmailToken
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
 from info import SALT
+from backend.signals import password_reset, new_order
 
 class RegisterUser(APIView):
     def post(self, request, *args, **kwargs):
         if {'username','first_name', 'last_name', 'email', 'password', 'company', 'age', 'position'}.issubset(request.data):
+            try:
+                validate_password(request.data['password'])
+            except Exception as password_error:
+                error_array = []
+                for item in password_error:
+                    error_array.append(item)
+                return JsonResponse({'Status': False, 'Errors': {'password': error_array}})
             user_serializer = UserSerializer(data=request.data)
             if user_serializer.is_valid():
                 user = user_serializer.save()
                 user.set_password(request.data['password']+SALT)
-                user.save()                
+                user.save()             
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': user_serializer.errors})
@@ -60,7 +67,24 @@ class DetailAccount(APIView):
                 user_serializer.save()
                 return JsonResponse({'Status': True})
             else:
-                return JsonResponse({'Status': False, 'Errors': user_serializer.errors})        
+                return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
+
+class RepairAccountView(APIView):
+    def get(self, request, *args, **kwargs):
+        if {'email'}.issubset(request.data):
+            user = User.objects.filter(email = request.data['email']).first()
+            password_reset.send(sender=self.__class__, user_id=user.__dict__['id'])
+            return JsonResponse({'Status': True}) 
+    def post(self,request, *args, **kwargs):
+        if {'token'}.issubset(request.data):
+            user_id = ResetEmailToken.objects.filter(key = request.data['token']).first()
+            user = User.objects.filter(id = user_id.__dict__['user_id']).first()
+            user_serializer = UserSerializer(user, data=request.data, partial=True)
+            if user_serializer.is_valid():
+                created_user = user_serializer.save() 
+                created_user.set_password(request.data['password']+SALT)
+                user.save()                              
+            return JsonResponse({'Status': True}) 
 
 class CategoryView(APIView):
     def get(self, request, *args, **kwargs):
@@ -300,6 +324,7 @@ class OrdersView(APIView):
                 order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial = True)
                 if order_item_serializer.is_valid():
                     order_item_serializer.save()
+                    new_order.send(sender=self.__class__, user_id=request.user.id)
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
@@ -322,7 +347,7 @@ class OrdersView(APIView):
         return JsonResponse({'Status': 'Done'})
     
 
-#коррекция views по юзерам и поставщикам
-#signals для отправки почты и подтверждения статусов, заказов и накладной
 #импорт шаблона yaml
+#коррекция urls
+#Celery???
            
