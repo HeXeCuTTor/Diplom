@@ -3,14 +3,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.http import JsonResponse
-from django.db import IntegrityError
 from django.contrib.auth import authenticate
 from django.db.models import Sum, F
+from django.utils import timezone
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
+from backend.models import Shop, Category, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
-    OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
+    OrderItemSerializer, OrderSerializer, ContactSerializer
 from info import SALT
 
 class RegisterUser(APIView):
@@ -70,7 +70,7 @@ class CategoryView(APIView):
     
     def post(self,request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         if Category.objects.get(name=request.data["name"]) is True:        
             serializer = CategorySerializer(data=request.data)
             if serializer.is_valid():
@@ -83,14 +83,15 @@ class CategoryView(APIView):
     
 
 class ShopView(APIView):
+    #done!!!
     def get(self, request, *args, **kwargs):
         shop = Shop.objects.all()           
         serializer = ShopSerializer(shop, many=True)
         return Response(serializer.data)
     
     def post(self,request, *args, **kwargs):
-        if not request.user.is_authenticated and request.user.type == 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Not Allowed'}, status=403) 
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})  
         # print(request.data)
         request.data.update({'user': request.user.id})
         # print(request.data)
@@ -102,32 +103,36 @@ class ShopView(APIView):
             return JsonResponse({'Status': False, 'Errors': serializer.errors})
         
     def patch(self,request, *args, **kwargs):
-        if not request.user.is_authenticated and request.user.type != 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Not Allowed'}, status=403) 
-        shop = Shop.objects.filter(id=request.data['id'], user_id=request.user.id).first()
-        # print(shop)    
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})  
+        shop = Shop.objects.filter(id=request.data['id']).first()
+        # print(shop.__dict__['user_id'])    
         serializer = ShopSerializer(shop, data=request.data, partial=True)
-        # if serializer.data[0]['user'] != request.user.id:
-        #     return JsonResponse({'Status': False, 'Error': 'Wrond user'})        
+        if shop.__dict__['user_id'] != request.user.id:
+            return JsonResponse({'Status': False, 'Error': 'Wrond user'})        
         if serializer.is_valid():
-            # print(serializer.__dict__)
             serializer.save()
             return JsonResponse({'Status': True})
         else:
             return JsonResponse({'Status': False, 'Errors': serializer.errors})
             
 class ContactView(APIView):
+    #done!!!!
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
+        if {'id'}.issubset(request.data):
+            contact_id = request.data['id']
+            contact = Contact.objects.filter(id=contact_id)
         else:
-            contact = Contact.objects.filter(user_id=request.user.id)
-            serializer = ContactSerializer(contact, many=True)
-            return Response(serializer.data)
+            contact_id = request.user.id
+            contact = Contact.objects.filter(user_id=contact_id)
+        serializer = ContactSerializer(contact, many=True)
+        return Response(serializer.data)
         
     def post(self,request,*args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         elif {'city', 'street', 'phone'}.issubset(request.data):
             request.data.update({'user': request.user.id})
             serializer = ContactSerializer(data=request.data)
@@ -141,17 +146,19 @@ class ContactView(APIView):
         
     def delete(self,request, *args,**kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         elif {'id'}.issubset(request.data):
             try:
                 Contact.objects.filter(id=request.data['id'], user_id=request.user.id).delete()
                 return JsonResponse({'Status': 'Done'})           
             except:
-                return JsonResponse({'Status': False, 'Errors': 'Incorrect arguments'})
-            
+                return JsonResponse({'Status': False, 'Errors': 'Incorrect arguments or user'})
+        else: 
+            return JsonResponse({"Status": False, "Errors": 'Not all arguments'})
+        
     def patch(self,request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         else:
             contact = Contact.objects.filter(id=request.data['id'], user_id=request.user.id).first()
             serializer = ContactSerializer(contact, data=request.data, partial=True)
@@ -161,19 +168,28 @@ class ContactView(APIView):
             else:
                 return JsonResponse({'Status': False, 'Errors': serializer.errors})
 
-class ProductInfoView(APIView):
+class ProductInfoView(APIView): 
+    #done!!!!
     def get(self,request, *args, **kwargs):
         product = ProductInfo.objects.filter(product=request.data['product_id'], shop=request.data['shop_id'])
         product_serializer = ProductInfoSerializer(product, many = True)
         return Response(product_serializer.data)
     
     def post(self,request,*args,**kwargs):
-        if not request.user.is_authenticated or request.user.type != 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)        
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})       
         elif {'product', 'shop'}.issubset(request.data):        
             serializer = ProductInfoSerializer(data=request.data, partial = True)
             if serializer.is_valid():
-                serializer.save()
+                creation_product_info = serializer.save()
+                if {'product_parameters'}.issubset(request.data):
+                    for name, value in request.data['product_parameters'][0].items():
+                        parameter_object, _ = Parameter.objects.get_or_create(name=name)
+                        ProductParameter.objects.create(product_info_id=creation_product_info.id,
+                                                        parameter_id=parameter_object.id,
+                                                        value=value)
+                else:
+                    return JsonResponse({'Status': True, 'Info': 'Another parameters is none'})                      
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': False, 'Errors': serializer.errors})
@@ -181,8 +197,8 @@ class ProductInfoView(APIView):
             return JsonResponse({"Status": False, "Errors": 'Not all arguments'})
 
     def patch(self,request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.type != 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         shop = Shop.objects.filter(id=request.data['shop'])
         shop_serializer = ShopSerializer(shop, many = True)
         # print(shop_serializer.data[0]['user'])
@@ -192,14 +208,22 @@ class ProductInfoView(APIView):
         # print(product_info)
         product_info_serializer = ProductInfoSerializer(product_info, data=request.data, partial=True)
         if product_info_serializer.is_valid():
-            product_info_serializer.save()
+            creation_product_info = product_info_serializer.save()
+            if {'product_parameters'}.issubset(request.data):
+                for name, value in request.data['product_parameters'][0].items():
+                    parameter_object, _ = Parameter.objects.get_or_create(name=name)
+                    ProductParameter.objects.update_or_create(product_info_id=creation_product_info.id,
+                                                                parameter_id=parameter_object.id,
+                                                                defaults = {'value': value})
+            else:
+                return JsonResponse({'Status': True, 'Info': 'Another parameters is none'})              
             return JsonResponse({'Status': True})
         else:
             return JsonResponse({'Status': False, 'Errors': product_info_serializer.errors})
         
     def delete(self,request, *args,**kwargs):
-        if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+        if not request.user.is_authenticated or request.user.type == 'buyer':
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         shop = Shop.objects.filter(id=request.data['shop'])
         shop_serializer = ShopSerializer(shop, many = True)
         if shop_serializer.data == []:
@@ -213,25 +237,33 @@ class ProductInfoView(APIView):
             except:
                 return JsonResponse({'Status': False, 'Errors': 'Incorrect arguments'})
             
-class BasketView(APIView):
+class OrdersView(APIView):
+    #done!!!!!!!!!
     def get(self,request,*args,**kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
-        basket = Order.objects.filter(
-            user_id=request.user.id, status='basket').prefetch_related(
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
+        if request.user.type != 'buyer':
+            basket = Order.objects.filter(
+                user_id=request.user.id, status='basket').prefetch_related(
+                'ordered_items__product_info__product__category',
+                'ordered_items__product_info__product_parameters__parameter').annotate(
+                total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
+            serializer = OrderSerializer(basket, many=True)
+            return Response(serializer.data)
+        else:
+            order = Order.objects.filter(
+            ordered_items__product_info__shop__user_id=request.user.id).exclude(status='basket').prefetch_related(
             'ordered_items__product_info__product__category',
-            'ordered_items__product_info__product_parameters__parameter').annotate(
+            'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
-        serializer = OrderSerializer(basket, many=True)
-        return Response(serializer.data)
+            serializer = OrderSerializer(order, many=True)
+            return Response(serializer.data)           
     
     def post(self,request,*args,**kwargs):
         if not request.user.is_authenticated or request.user.type != 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         elif {'product_info', 'quantity'}.issubset(request.data):
-            contact = Contact.objects.filter(user_id=request.user.id)
-            serializer_contact = ContactSerializer(contact, many=True)
-            order = {'user': request.user.id,'contact': serializer_contact.data[0]['id'], 'status': 'basket'}
+            order = {'user': request.user.id, 'status': 'basket'}
             order_serializer = OrderSerializer(data=order,partial=True)
             if order_serializer.is_valid():
                 creation_order = order_serializer.save()
@@ -250,20 +282,39 @@ class BasketView(APIView):
                 return JsonResponse({'Status': False, 'Errors': 'Not working'})
                 
     def patch(self,request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.type != 'buyer':
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
-        order_item = OrderItem.objects.filter(id=request.data['id']).first()
-        order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial = True)
-        if order_item_serializer.is_valid():
-            order_item_serializer.save()
+        if not request.user.is_authenticated:
+            return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
+        order = Order.objects.filter(id=request.data['id']).first()
+        if request.user.type != 'shop' and 'contact' in request.data:
+            order_update = {'status': 'new',
+                            'contact': request.data['contact']
+                        }
+            order_serializer = OrderSerializer(order, data=order_update,partial=True)
+            if order_serializer.is_valid():
+                order_serializer.save()
+                order_item = OrderItem.objects.filter(order_id=request.data['id']).first()
+                order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial = True)
+                if order_item_serializer.is_valid():
+                    order_item_serializer.save()
+                    return JsonResponse({'Status': True})
+                else:
+                    return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
+            else:
+                return JsonResponse({'Status': False, 'Errors': order_serializer.errors})
+        elif request.user.type == 'shop':
+            order.update(status= request.data['status'])
             return JsonResponse({'Status': True})
         else:
-            return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
+            return JsonResponse({'Status': False, 'Errors': 'Not all arguments'})
 
     def delete(self,request, *args,**kwargs):
         if not request.user.is_authenticated or request.user.type != 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
-        order = Order.objects.filter(id=request.data['id']).delete()
+        order = Order.objects.filter(id=request.data['id']).first()
+        if order.__dict__['status'] != 'basket':
+            return JsonResponse({'Status': False, 'Error': 'Order cancel impossible'})
+        else:
+            order.delete()
         return JsonResponse({'Status': 'Done'})
     
 

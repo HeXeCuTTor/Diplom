@@ -30,12 +30,13 @@ Content-Type: application/json
 # добавление магазинов
 POST {{baseUrl}}/shops
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
+
 
 {
-  "name": "cool shop",
-  "url": "http://check.com",
-  "status": "active"
+  "name": "cured66eee",
+  "url": "http://iuitm.com"
 }
 
 ###
@@ -48,9 +49,9 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
   "id": 27,
-  "name": "coouul shop",
+  "name": "гггuulнн sho77p",
   "url": "http://check.ru",
-  "user": 13
+  "status": "closed"
 }
 
 ###
@@ -60,10 +61,10 @@ POST {{baseUrl}}/user/register
 Content-Type: application/json
 
 {
-  "username": "vers",
+  "username": "vwwwers",
   "first_name": "CLOSED",
   "last_name":"check",
-  "email":"agh7gehf9@gmail.com",
+  "email":"agh7gerrr9@gmail.com",
   "password":"che11ck",
   "age": 67,
   "company":"check",
@@ -77,7 +78,7 @@ POST {{baseUrl}}/user/login
 Content-Type: application/json
 
 {
-  "email":"agh7gehf9@gmail.com",
+  "email":"agh7gehuuuf9@gmail.com",
   "password":"che11ck"
 }
 
@@ -93,10 +94,12 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 #редактирование данных аккаунта
 POST {{baseUrl}}/user/detail_account
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
 
 {
-  "email":"agh7gehf9@gmail.com",
+  "username": "stars",
+  "email":"agh7gehuuuf9@gmail.com",
   "age":"55"
 }
 ###
@@ -104,7 +107,14 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 #получение контактов
 GET {{baseUrl}}/user/contacts
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
+
+{
+  "id": 18
+}
+
+
 ###
 
 #редактирование контакта
@@ -152,13 +162,14 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-"model": "Siemens",
-"info_id": 4,
+"model": "Vodka",
+"info_id": 66,
 "product": 1,
 "shop": 27,
 "quantity": 6576,
 "price": 98878,
-"price_rrc": 80000
+"price_rrc": 80000,
+"product_parameters": [{"weight": 34, "height": 777}]
 }
 ###
 
@@ -180,10 +191,11 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "product_info_id": 63,
+  "product_info_id": 70,
   "shop": 27,
   "product": 1,
-  "info_id": 6
+  "info_id": 99,
+  "product_parameters": [{"weight": 1010, "height": 6666}]
 }
 
 ###
@@ -194,13 +206,13 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
-  "id": 64,
+  "id": 65,
   "shop": 27
 }
 
 ###
 # добавление товара в корзину
-POST {{baseUrl}}/basket/info
+POST {{baseUrl}}/orders
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
@@ -213,33 +225,34 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
 
-# просмотр корзины
-GET {{baseUrl}}/basket/info
+# просмотр товаров в корзине или для поставщика
+GET {{baseUrl}}/orders
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
 # редактирование корзины/подтверждение заказа
-PATCH  {{baseUrl}}/basket/info
+PATCH  {{baseUrl}}/orders
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
 
-"id": 25, 
-"quantity": 4444
+"id": 50, 
+"contact": 18,
+"product_info": 63
 
 }
 
 ###
 # удаление товара из корзины
-DELETE  {{baseUrl}}/basket/info
+DELETE  {{baseUrl}}/orders
 Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 {
 
-"id": 46
+"id": 48
 
 }
 

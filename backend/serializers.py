@@ -46,7 +46,7 @@ class ProductParameterSerializer(serializers.ModelSerializer):
 
 class ProductInfoSerializer(serializers.ModelSerializer):
     product = ProductSerializer
-    product_parameters = ProductParameterSerializer(many=True)
+    product_parameters = ProductParameterSerializer(read_only=True, many=True)
 
     # product = ProductSerializer(read_only=True)
     # product_parameters = ProductParameterSerializer(read_only=True, many=True)
