@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 import os
+import info
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,10 +135,10 @@ AUTH_USER_MODEL = 'backend.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.mail.com'
-EMAIL_HOST_USER = 'example@mail.ru'
-EMAIL_HOST_PASSWORD = 'password_host'
-EMAIL_PORT = '465'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = info.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = info.EMAIL_HOST_PASSWORD
+EMAIL_PORT = info.EMAIL_PORT
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 
@@ -145,4 +146,5 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+
 }

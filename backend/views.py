@@ -13,8 +13,7 @@ from backend.models import User, Shop, Category, Product, ProductInfo, Parameter
     Contact, ResetEmailToken
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
-from info import SALT
-from backend.signals import password_reset, new_order
+from info import SALT, EMAIL_HOST_USER
 
 class RegisterUser(APIView):
     def post(self, request, *args, **kwargs):
@@ -30,15 +29,15 @@ class RegisterUser(APIView):
             if user_serializer.is_valid():
                 user = user_serializer.save()
                 user.set_password(request.data['password']+SALT)
-                user.save()            
-                #отправка email c ResetEmailToken 
+                user.save()
+                token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
+                send_mail("Подтверждение регистрации",f"Confirm token is {token.key}", EMAIL_HOST_USER, [user.email])
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': user_serializer.errors})
         else:    
             return JsonResponse({'Status': False, 'Errors': 'Not all agruments'})
         
-
 class ConfirmAccountUser(APIView):
     def post(self, request, *args, **kwargs):
         if {'email', 'token'}.issubset(request.data):
@@ -70,14 +69,14 @@ class LogInUser(APIView):
 class DetailAccount(APIView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'})
         else:           
             serializer = UserSerializer(request.user)
             return Response(serializer.data)
         
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)    
+            return JsonResponse({'Status': False, 'Error': 'Log in required'})    
         else:
             if 'password' in request.data:
                 request.user.set_password(request.data['password'])
@@ -92,8 +91,9 @@ class RepairAccountView(APIView):
     def get(self, request, *args, **kwargs):
         if {'email'}.issubset(request.data):
             user = User.objects.filter(email = request.data['email']).first()
-            password_reset.send(sender=self.__class__, user_id=user.__dict__['id'])
-            return JsonResponse({'Status': "На ваш email отправлен токен для восстановления вашего аккаунта"}) 
+            token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
+            send_mail("Восстановление пароля",f"Reset password token is {token.key}", EMAIL_HOST_USER, [user.email])            
+            return JsonResponse({'Status': "Token sent on your email-adress"}) 
         
     def post(self,request, *args, **kwargs):
         if {'token'}.issubset(request.data):
@@ -104,7 +104,7 @@ class RepairAccountView(APIView):
                 created_user = user_serializer.save() 
                 created_user.set_password(request.data['password']+SALT)
                 user.save()
-                ResetEmailToken.objects.get(user_id=user_id).delete()                              
+                user_id.delete()                              
             return JsonResponse({'Status': True}) 
 
 class CategoryView(APIView):
@@ -341,7 +341,7 @@ class OrdersView(APIView):
                 order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial = True)
                 if order_item_serializer.is_valid():
                     order_item_serializer.save()
-                    new_order.send(sender=self.__class__, user_id=request.user.id)
+                    send_mail("Ваш заказ сформирован",f"Заказ №{order.id} сформирован", EMAIL_HOST_USER, [request.user.email]) 
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
@@ -389,8 +389,5 @@ class ProductUploadFile(APIView):
                                                                 defaults = {'value': value})
         return JsonResponse({'Status': 'Done'})                   
 
-
-#импорт шаблона yaml
-#коррекция urls
 #Celery???
            

@@ -49,7 +49,6 @@ Content-Type: application/json
 # добавление магазинов
 POST {{baseUrl}}/shops
 Content-Type: application/json
-# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
 
 
@@ -162,7 +161,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 #Добавление контакта
 POST {{baseUrl}}/user/contacts
 Content-Type: application/json
-Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
   "city": "uoooooo",
@@ -234,12 +233,12 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 # добавление товара в корзину
 POST {{baseUrl}}/orders
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
 
-"product_info": 63, 
-"quantity": 44
+"product_info": 5, 
+"quantity": 22
 
 }
 
@@ -254,13 +253,13 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 # редактирование корзины/подтверждение заказа
 PATCH  {{baseUrl}}/orders
 Content-Type: application/json
-Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
 
 "id": 1, 
-"contact": 1,
-"product_info": 1
+"contact": 2,
+"product_info": 5
 
 }
 
@@ -296,7 +295,7 @@ Content-Type: application/json
 
 {
 
-"token": "ef34322e266e542b2e",
+"token": "57fed45aaef618bf2ee3236b7983c5652",
 "email":"ilyavoloshin20@gmail.com",
 "password": "fkwjfjwfjwefwef11",
 "first_name": "Iutrrrrrrhrg"
@@ -306,22 +305,25 @@ Content-Type: application/json
 
 #добавление товара из файла
 POST {{baseUrl}}/product/upload_file
-Content-Type: application/yaml
-Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
+Content-Type: application/json
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
-"url": "https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml"
+
+"url":"https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml"
+
 }
+
+
 ###
 
-# вход
+# подтверждение регистрации
 POST {{baseUrl}}/user/register/confirm
 Content-Type: application/json
 
 {
 "email":"ilyavoloshin20@gmail.com",
-"token": "a8c26c6f43dff7ac70123e4d8cacfa7b9d12c95cff76d245"
-
+"token": "0883175efaa4f1f003657172431ad6b6"
 }
 
 ###
