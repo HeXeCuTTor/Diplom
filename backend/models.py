@@ -190,8 +190,8 @@ class OrderItem(models.Model):
 
 class ResetEmailToken(models.Model):
     class Meta:
-        verbose_name = 'Токен сброса пароля'
-        verbose_name_plural = 'Токены сброса пароля'
+        verbose_name = 'Токен сброса пароля и подтверждения email'
+        verbose_name_plural = 'Токены сброса пароля и подтверждения email'
 
     @staticmethod
     def generate_key():

@@ -277,6 +277,7 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 }
 
 ###
+#отправка токена восстановления пароля на почту
 
 GET {{baseUrl}}/user/recovery_password
 Content-Type: application/json
@@ -288,6 +289,7 @@ Content-Type: application/json
 }
 
 ###
+#восстановление пароля
 
 POST {{baseUrl}}/user/recovery_password
 Content-Type: application/json
@@ -300,3 +302,26 @@ Content-Type: application/json
 "first_name": "Iutrrrrrrhrg"
 
 }
+###
+
+#добавление товара из файла
+POST {{baseUrl}}/product/upload_file
+Content-Type: application/yaml
+Authorization: Token 04bbe259253fe398e54d61917d3e2c1fd3f8cd41
+
+{
+"url": "https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml"
+}
+###
+
+# вход
+POST {{baseUrl}}/user/register/confirm
+Content-Type: application/json
+
+{
+"email":"ilyavoloshin20@gmail.com",
+"token": "a8c26c6f43dff7ac70123e4d8cacfa7b9d12c95cff76d245"
+
+}
+
+###
