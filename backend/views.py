@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from django.db.models import Sum, F
 from yaml import load as load_yaml, Loader
 from requests import get
+from django.utils import timezone
 
 from backend.models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ResetEmailToken

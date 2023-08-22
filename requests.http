@@ -106,8 +106,7 @@ Content-Type: application/json
 #получение данных аккаунта
 GET {{baseUrl}}/user/detail_account
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
-
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 ###
 
 #редактирование данных аккаунта
@@ -250,6 +249,7 @@ Content-Type: application/json
 Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 
 ###
+
 # редактирование корзины/подтверждение заказа
 PATCH  {{baseUrl}}/orders
 Content-Type: application/json
@@ -303,7 +303,7 @@ Content-Type: application/json
 }
 ###
 
-#добавление товара из файла
+#добавление товаров из файла
 POST {{baseUrl}}/product/upload_file
 Content-Type: application/json
 Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
