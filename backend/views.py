@@ -61,7 +61,7 @@ class LogInUser(APIView):
             user_confirm = ResetEmailToken.objects.filter(user_id=user.id).first()
             if user is not None and user_confirm is None and user.is_active:
                 token, _ = Token.objects.get_or_create(user=user)
-                return JsonResponse({'Status': True, 'Token': token.key})
+                return JsonResponse({'Status': True, 'Token': "Success"})
             else:
                 return JsonResponse({'Status': False, 'Errors': 'Wrong login or password'})
         else:

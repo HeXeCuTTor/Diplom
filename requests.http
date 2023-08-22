@@ -82,7 +82,7 @@ Content-Type: application/json
   "username": "vwwwers",
   "first_name": "CLOSED",
   "last_name":"check",
-  "email":"ilyavoloshin20@gmail.com",
+  "email":"ilyavoeeewew@gmaiil.com",
   "password":"che11ckuuu",
   "age": 67,
   "company":"check",
@@ -96,8 +96,8 @@ POST {{baseUrl}}/user/login
 Content-Type: application/json
 
 {
-"email":"ilyavoloshin20@gmail.com",
-"password": "fkwjfjwfjwefwef11"
+"email":"ilyavoeeewew@gmaiil.com",
+"password": "che11ckuuu"
 
 }
 
@@ -322,8 +322,8 @@ POST {{baseUrl}}/user/register/confirm
 Content-Type: application/json
 
 {
-"email":"ilyavoloshin20@gmail.com",
-"token": "0883175efaa4f1f003657172431ad6b6"
+"email":"ilyavoeeewew@gmaiil.com",
+"token": "7730b77f0a4475462fccf04c6979c0104e5d20094af3"
 }
 
 ###
