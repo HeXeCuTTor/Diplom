@@ -120,7 +120,6 @@ class CategoryView(APIView):
         Category.objects.get_or_create(name=request.data["name"])       
         return JsonResponse({'Status': True})
   
-
 class ShopView(APIView):
     def get(self, request, *args, **kwargs):
         shop = Shop.objects.all()           

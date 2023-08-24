@@ -113,7 +113,7 @@ Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 POST {{baseUrl}}/user/detail_account
 Content-Type: application/json
 # Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
-Authorization: Token bd14074aefa5730334c8b55c5e4996aec01ed07c
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
   "username": "stars",
@@ -177,13 +177,13 @@ Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 #добавление инфо товара
 POST {{baseUrl}}/product/info
 Content-Type: application/json
-Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
 "model": "Vodka",
 "info_id": 66,
-"product": 1,
-"shop": 27,
+"product": 5,
+"shop": 8,
 "quantity": 6576,
 "price": 98878,
 "price_rrc": 80000,
@@ -236,9 +236,8 @@ Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 
 {
 
-"product_info": 5, 
-"quantity": 22
-
+"product_info": 7, 
+"quantity": 12
 }
 
 ###
