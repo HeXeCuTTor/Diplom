@@ -2,12 +2,104 @@
 
 @baseUrl = http://127.0.0.1:8000/api/v1
 
+
+# регистрация пользователя
+POST {{baseUrl}}/user/register
+Content-Type: application/json
+
+{
+  "username": "vwwwers",
+  "first_name": "CLOSED",
+  "last_name":"check",
+  "email":"ilyavoeeewew@gmaiil.com",
+  "password":"che11ckuuu",
+  "age": 67,
+  "company":"check",
+  "position": 7678
+}
+
+###
+
+# вход
+POST {{baseUrl}}/user/login
+Content-Type: application/json
+
+{
+"email":"ilyavoeeewew@gmaiil.com",
+"password": "che11ckuuu"
+
+}
+
+###
+
+#получение данных аккаунта
+GET {{baseUrl}}/user/detail_account
+Content-Type: application/json
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
+###
+
+#редактирование данных аккаунта
+POST {{baseUrl}}/user/detail_account
+Content-Type: application/json
+# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
+Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
+
+{
+  "username": "uyuuuu",
+  "email":"oooio0@gmail.com",
+  "age":"55",
+  "password": "gfrdcr6668"
+}
+
+###
+
+# подтверждение регистрации
+POST {{baseUrl}}/user/register/confirm
+Content-Type: application/json
+
+{
+"email":"ilyavoeeewew@gmaiil.com",
+"token": "7730b77f0a4475462fccf04c6979c0104e5d20094af3"
+}
+
+###
+
+###
+
+#отправка токена восстановления пароля на почту
+
+GET {{baseUrl}}/user/recovery_password
+Content-Type: application/json
+
+{
+
+"email":"ilyavoloshin20@gmail.com"
+
+}
+
+###
+
+#восстановление пароля по токену
+
+POST {{baseUrl}}/user/recovery_password
+Content-Type: application/json
+
+{
+
+"token": "57fed45aaef618bf2ee3236b7983c5652",
+"email":"ilyavoloshin20@gmail.com",
+"password": "fkwjfjwfjwefwef11",
+"first_name": "Iutrrrrrrhrg"
+
+}
+
+###
+
 # получение категорий
 GET {{baseUrl}}/categories
 Content-Type: application/json
 
 ###
-
 
 # добавление категорий
 POST {{baseUrl}}/categories
@@ -72,54 +164,6 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
   "status": "closed"
 }
 
-###
-
-# создание пользователя
-POST {{baseUrl}}/user/register
-Content-Type: application/json
-
-{
-  "username": "vwwwers",
-  "first_name": "CLOSED",
-  "last_name":"check",
-  "email":"ilyavoeeewew@gmaiil.com",
-  "password":"che11ckuuu",
-  "age": 67,
-  "company":"check",
-  "position": 7678
-}
-
-###
-
-# вход
-POST {{baseUrl}}/user/login
-Content-Type: application/json
-
-{
-"email":"ilyavoeeewew@gmaiil.com",
-"password": "che11ckuuu"
-
-}
-
-###
-
-#получение данных аккаунта
-GET {{baseUrl}}/user/detail_account
-Content-Type: application/json
-Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
-###
-
-#редактирование данных аккаунта
-POST {{baseUrl}}/user/detail_account
-Content-Type: application/json
-# Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
-Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
-
-{
-  "username": "stars",
-  "email":"oooio0@gmail.com",
-  "age":"55"
-}
 ###
 
 #получение контактов
@@ -275,32 +319,6 @@ Authorization: Token d1e3abe426ee0c31d674f61d9af750913358f062
 }
 
 ###
-#отправка токена восстановления пароля на почту
-
-GET {{baseUrl}}/user/recovery_password
-Content-Type: application/json
-
-{
-
-"email":"ilyavoloshin20@gmail.com"
-
-}
-
-###
-#восстановление пароля
-
-POST {{baseUrl}}/user/recovery_password
-Content-Type: application/json
-
-{
-
-"token": "57fed45aaef618bf2ee3236b7983c5652",
-"email":"ilyavoloshin20@gmail.com",
-"password": "fkwjfjwfjwefwef11",
-"first_name": "Iutrrrrrrhrg"
-
-}
-###
 
 #добавление товаров из файла
 POST {{baseUrl}}/product/upload_file
@@ -312,17 +330,3 @@ Authorization: Token 0a80adc645cb0c5e7772980a5d1a402f1da2f719
 "url":"https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml"
 
 }
-
-
-###
-
-# подтверждение регистрации
-POST {{baseUrl}}/user/register/confirm
-Content-Type: application/json
-
-{
-"email":"ilyavoeeewew@gmaiil.com",
-"token": "7730b77f0a4475462fccf04c6979c0104e5d20094af3"
-}
-
-###

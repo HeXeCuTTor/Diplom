@@ -1,4 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import update_last_login
+from django.contrib.auth.signals import user_logged_in
 from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +10,6 @@ from django.contrib.auth import authenticate
 from django.db.models import Sum, F
 from yaml import load as load_yaml, Loader
 from requests import get
-from django.utils import timezone
 
 from backend.models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ResetEmailToken
@@ -61,7 +62,8 @@ class LogInUser(APIView):
             user_confirm = ResetEmailToken.objects.filter(user_id=user.id).first()
             if user is not None and user_confirm is None and user.is_active:
                 token, _ = Token.objects.get_or_create(user=user)
-                return JsonResponse({'Status': True, 'Token': "Success"})
+                update_last_login(None, user)
+                return JsonResponse({'Status': True, 'Token': token.key})
             else:
                 return JsonResponse({'Status': False, 'Errors': 'Wrong login or password'})
         else:
@@ -389,5 +391,4 @@ class ProductUploadFile(APIView):
                                                                 defaults = {'value': value})
         return JsonResponse({'Status': 'Done'})                   
 
-#Celery???
            
