@@ -30,7 +30,10 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
     email = models.EmailField(_('email address'), unique=True)
-    company = models.CharField(max_length=40, blank=True, verbose_name='Компания')
+    company = models.CharField(max_length=40, 
+                               blank=True, 
+                               verbose_name='Компания'
+                            )
     age = models.PositiveIntegerField(blank=True, verbose_name="Возраст")
     username_validator = UnicodeUsernameValidator()
     username = models.CharField(
@@ -42,10 +45,15 @@ class User(AbstractUser):
             'unique': _("Пользователь с данным именем уже присутствует."),
         },
     )
-    type = models.CharField(verbose_name='Тип пользователя', choices=USER_TYPE_CHOICES, max_length=5, default='buyer')
+    type = models.CharField(verbose_name='Тип пользователя', 
+                            choices=USER_TYPE_CHOICES, 
+                            max_length=5, 
+                            default='buyer'
+                            )
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'    
+
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -53,7 +61,7 @@ class User(AbstractUser):
         ordering = ('email',)
 
 class Shop(models.Model):
-    name = models.CharField(max_length=60, verbose_name = "Название магазина")
+    name = models.CharField(max_length=60, verbose_name="Название магазина")
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)
     user = models.OneToOneField(User, verbose_name='Пользователь', blank=True, null=True, on_delete=models.CASCADE)  
     status = models.CharField(verbose_name='Статус магазина', choices=SHOP_STATUS, max_length=8, default='active')
@@ -78,6 +86,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
+
 class Product(models.Model):
     name = models.CharField(max_length=80, verbose_name='Название')
     category = models.ForeignKey(Category, verbose_name='Категория', related_name='products', blank=True,
@@ -90,6 +99,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+   
     
 class ProductInfo(models.Model):
     model = models.CharField(max_length=80, verbose_name='Модель', blank=True)
@@ -109,6 +119,7 @@ class ProductInfo(models.Model):
             models.UniqueConstraint(fields=['product', 'shop', 'info_id'], name='unique_product_info'),
         ]
 
+
 class Parameter(models.Model):
     name = models.CharField(max_length=40, verbose_name='Название')
 
@@ -119,6 +130,7 @@ class Parameter(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ProductParameter(models.Model):
     product_info = models.ForeignKey(ProductInfo, verbose_name='Информация о продукте',
@@ -134,6 +146,7 @@ class ProductParameter(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['product_info', 'parameter'], name='unique_product_parameter'),
         ]
+
 
 class Contact(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь',
@@ -173,6 +186,7 @@ class Order(models.Model):
     def __str__(self):
         return str(self.creation_time)
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, verbose_name='Заказ', related_name='ordered_items', blank=True,
                               on_delete=models.CASCADE)
@@ -187,6 +201,7 @@ class OrderItem(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['order_id', 'product_info'], name='unique_order_item'),
         ]
+
 
 class ResetEmailToken(models.Model):
     class Meta:

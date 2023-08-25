@@ -1,6 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth.signals import user_logged_in
 from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,9 +16,10 @@ from backend.serializers import UserSerializer, CategorySerializer, ShopSerializ
     OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
 from info import SALT, EMAIL_HOST_USER
 
+# Регистрация пользователя
 class RegisterUser(APIView):
     def post(self, request, *args, **kwargs):
-        if {'username','first_name', 'last_name', 'email', 'password', 'company', 'age', 'position'}.issubset(request.data):
+        if {'username', 'first_name', 'last_name', 'email', 'password', 'company', 'age', 'position'}.issubset(request.data):
             try:
                 validate_password(request.data['password'])
             except Exception as password_error:
@@ -33,18 +33,20 @@ class RegisterUser(APIView):
                 user.set_password(request.data['password']+SALT)
                 user.save()
                 token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
-                send_mail("Подтверждение регистрации",f"Confirm token is {token.key}", EMAIL_HOST_USER, [user.email])
+                send_mail("Подтверждение регистрации", f"Confirm token is {token.key}", EMAIL_HOST_USER, [user.email])
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': user_serializer.errors})
         else:    
             return JsonResponse({'Status': False, 'Errors': 'Not all agruments'})
         
+
+# Подтверждение аккаунта        
 class ConfirmAccountUser(APIView):
     def post(self, request, *args, **kwargs):
         if {'email', 'token'}.issubset(request.data):
             user = User.objects.filter(email=request.data['email']).first()
-            token = ResetEmailToken.objects.filter(user_id=user.__dict__['id'],key=request.data['token']).first()
+            token = ResetEmailToken.objects.filter(user_id=user.__dict__['id'], key=request.data['token']).first()
             # print(token)
             if token is not None:
                 auth_token, _ = Token.objects.get_or_create(user=user)
@@ -55,6 +57,8 @@ class ConfirmAccountUser(APIView):
         else:
             return JsonResponse({'Status': False, 'Errors': 'Not all arguments'})
         
+
+# Вход на сайт        
 class LogInUser(APIView):
     def post(self, request, *args, **kwargs):
         if {'email', 'password'}.issubset(request.data):
@@ -67,8 +71,10 @@ class LogInUser(APIView):
             else:
                 return JsonResponse({'Status': False, 'Errors': 'Wrong login or password'})
         else:
-            return JsonResponse({'Status': False, 'Errors': 'Not all arguments'})
+            return JsonResponse({'Status': False, 'Errors': 'Not all arguments'})  
 
+
+# View для работы с данными аккаунта (просмотр, добавление, изменение)
 class DetailAccount(APIView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -89,19 +95,21 @@ class DetailAccount(APIView):
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
+            
 
+# View для восстановления доступа к аккаунту
 class RepairAccountView(APIView):
     def get(self, request, *args, **kwargs):
         if {'email'}.issubset(request.data):
-            user = User.objects.filter(email = request.data['email']).first()
+            user = User.objects.filter(email=request.data['email']).first()
             token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
-            send_mail("Восстановление пароля",f"Reset password token is {token.key}", EMAIL_HOST_USER, [user.email])            
+            send_mail("Восстановление пароля", f"Reset password token is {token.key}", EMAIL_HOST_USER, [user.email])            
             return JsonResponse({'Status': "Token sent on your email-adress"}) 
-        
-    def post(self,request, *args, **kwargs):
+       
+    def post(self, request, *args, **kwargs):
         if {'token'}.issubset(request.data):
-            user_id = ResetEmailToken.objects.filter(key = request.data['token']).first()
-            user = User.objects.filter(id = user_id.__dict__['user_id']).first()
+            user_id = ResetEmailToken.objects.filter(key=request.data['token']).first()
+            user = User.objects.filter(id=user_id.__dict__['user_id']).first()
             user_serializer = UserSerializer(user, data=request.data, partial=True)
             if user_serializer.is_valid():
                 created_user = user_serializer.save() 
@@ -109,26 +117,30 @@ class RepairAccountView(APIView):
                 user.save()
                 user_id.delete()                              
             return JsonResponse({'Status': True}) 
+        
 
+# View категорий товаров
 class CategoryView(APIView):
     def get(self, request, *args, **kwargs):
         category = Category.objects.all()           
         serializer = CategorySerializer(category, many=True)
         return Response(serializer.data)
     
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         Category.objects.get_or_create(name=request.data["name"])       
         return JsonResponse({'Status': True})
-  
+    
+
+# View для магазинов  
 class ShopView(APIView):
     def get(self, request, *args, **kwargs):
         shop = Shop.objects.all()           
         serializer = ShopSerializer(shop, many=True)
         return Response(serializer.data)
     
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})  
         # print(request.data)
@@ -141,7 +153,7 @@ class ShopView(APIView):
         else:
             return JsonResponse({'Status': False, 'Errors': serializer.errors})
         
-    def patch(self,request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})  
         shop = Shop.objects.filter(id=request.data['id']).first()
@@ -154,7 +166,9 @@ class ShopView(APIView):
             return JsonResponse({'Status': True})
         else:
             return JsonResponse({'Status': False, 'Errors': serializer.errors})
-            
+        
+
+# View для контактов           
 class ContactView(APIView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -168,7 +182,7 @@ class ContactView(APIView):
         serializer = ContactSerializer(contact, many=True)
         return Response(serializer.data)
         
-    def post(self,request,*args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         elif {'city', 'street', 'phone'}.issubset(request.data):
@@ -182,7 +196,7 @@ class ContactView(APIView):
         else:
             return JsonResponse({'Status': False, 'Errors': 'Authentification mistake or Incorrect arguments'})
         
-    def delete(self,request, *args,**kwargs):
+    def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         elif {'id'}.issubset(request.data):
@@ -194,7 +208,7 @@ class ContactView(APIView):
         else: 
             return JsonResponse({"Status": False, "Errors": 'Not all arguments'})
         
-    def patch(self,request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         else:
@@ -205,29 +219,34 @@ class ContactView(APIView):
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': False, 'Errors': serializer.errors})
+            
+
+# View для наименований продуктов            
 class ProductView(APIView):
     def get(self, request, *args, **kwargs):
         product = Product.objects.all()           
         serializer = ProductSerializer(product, many=True)
         return Response(serializer.data)
     
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         Product.objects.get_or_create(name=request.data["name"], category_id=request.data['category_id'])       
         return JsonResponse({'Status': True}) 
+    
 
+# View для работы с информацией о продукте
 class ProductInfoView(APIView): 
-    def get(self,request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         product = ProductInfo.objects.filter(product=request.data['product_id'], shop=request.data['shop_id'])
-        product_serializer = ProductInfoSerializer(product, many = True)
+        product_serializer = ProductInfoSerializer(product, many=True)
         return Response(product_serializer.data)
     
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})       
         elif {'product', 'shop'}.issubset(request.data):        
-            serializer = ProductInfoSerializer(data=request.data, partial = True)
+            serializer = ProductInfoSerializer(data=request.data, partial=True)
             if serializer.is_valid():
                 creation_product_info = serializer.save()
                 if {'product_parameters'}.issubset(request.data):
@@ -244,11 +263,11 @@ class ProductInfoView(APIView):
         else: 
             return JsonResponse({"Status": False, "Errors": 'Not all arguments'})
 
-    def patch(self,request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         shop = Shop.objects.filter(id=request.data['shop'])
-        shop_serializer = ShopSerializer(shop, many = True)
+        shop_serializer = ShopSerializer(shop, many=True)
         # print(shop_serializer.data[0]['user'])
         if shop_serializer.data[0]['user'] != request.user.id:
             return JsonResponse({'Status': False, 'Error': 'Wrond user'})
@@ -261,19 +280,19 @@ class ProductInfoView(APIView):
                 for name, value in request.data['product_parameters'][0].items():
                     parameter_object, _ = Parameter.objects.get_or_create(name=name)
                     ProductParameter.objects.update_or_create(product_info_id=creation_product_info.id,
-                                                                parameter_id=parameter_object.id,
-                                                                defaults = {'value': value})
+                                                              parameter_id=parameter_object.id,
+                                                              defaults={'value': value})
             else:
                 return JsonResponse({'Status': True, 'Info': 'Another parameters is none'})              
             return JsonResponse({'Status': True})
         else:
             return JsonResponse({'Status': False, 'Errors': product_info_serializer.errors})
         
-    def delete(self,request, *args,**kwargs):
+    def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type == 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         shop = Shop.objects.filter(id=request.data['shop'])
-        shop_serializer = ShopSerializer(shop, many = True)
+        shop_serializer = ShopSerializer(shop, many=True)
         if shop_serializer.data == []:
             return JsonResponse({'Status': False, 'Error': 'Not found'})
         if shop_serializer.data[0]['user'] != request.user.id:
@@ -285,8 +304,10 @@ class ProductInfoView(APIView):
             except:
                 return JsonResponse({'Status': False, 'Errors': 'Incorrect arguments'})
             
+
+# View для работы с заказами            
 class OrdersView(APIView):
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         if request.user.type != 'buyer':
@@ -306,18 +327,18 @@ class OrdersView(APIView):
             serializer = OrderSerializer(order, many=True)
             return Response(serializer.data)           
     
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type != 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         if {'product_info', 'quantity'}.issubset(request.data):
             order = {'user': request.user.id, 'status': 'basket'}
-            order_serializer = OrderSerializer(data=order,partial=True)
+            order_serializer = OrderSerializer(data=order, partial=True)
             if order_serializer.is_valid():
                 creation_order = order_serializer.save()
                 order_items = {'quantity': request.data['quantity'], 
                                'product_info': request.data['product_info'], 
-                                'order': creation_order.id
-                            }
+                               'order': creation_order.id
+                               }
                 # print(request.data['product_info_id'])
                 order_items_serializer = OrderItemSerializer(data=order_items)
                 if order_items_serializer.is_valid():
@@ -328,34 +349,34 @@ class OrdersView(APIView):
             else:
                 return JsonResponse({'Status': False, 'Errors': 'Not working'})
           
-    def patch(self,request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         order = Order.objects.filter(id=request.data['id']).first()
         if request.user.type != 'shop' and 'contact' in request.data:
             order_update = {'status': 'new',
                             'contact': request.data['contact']
-                        }
-            order_serializer = OrderSerializer(order, data=order_update,partial=True)
+                            }
+            order_serializer = OrderSerializer(order, data=order_update, partial=True)
             if order_serializer.is_valid():
                 order_serializer.save()
                 order_item = OrderItem.objects.filter(order_id=request.data['id']).first()
-                order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial = True)
+                order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial=True)
                 if order_item_serializer.is_valid():
                     order_item_serializer.save()
-                    send_mail("Ваш заказ сформирован",f"Заказ №{order.id} сформирован", EMAIL_HOST_USER, [request.user.email]) 
+                    send_mail("Ваш заказ сформирован", f"Заказ №{order.id} сформирован", EMAIL_HOST_USER, [request.user.email])
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
             else:
                 return JsonResponse({'Status': False, 'Errors': order_serializer.errors})
         elif request.user.type == 'shop':
-            order.update(status= request.data['status'])
+            order.update(status=request.data['status'])
             return JsonResponse({'Status': True})
         else:
             return JsonResponse({'Status': False, 'Errors': 'Not all arguments'})
 
-    def delete(self,request, *args,**kwargs):
+    def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.type != 'buyer':
             return JsonResponse({'Status': False, 'Error': 'Not authorized user'})
         order = Order.objects.filter(id=request.data['id']).first()
@@ -365,15 +386,17 @@ class OrdersView(APIView):
             order.delete()
         return JsonResponse({'Status': 'Done'})
 
+
+# View для загрузки данных продуктов из файла
 class ProductUploadFile(APIView):
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
         url = request.data.get('url')
         data = get(url).content
         json_data = load_yaml(data, Loader=Loader)
         shop, _ = Shop.objects.get_or_create(name=json_data['shop'], user_id=request.user.id)
         for category in json_data['categories']:
             category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
-        ProductInfo.objects.filter(shop_id=shop.id).delete() 
+        ProductInfo.objects.filter(shop_id=shop.id).delete()
         for goods in json_data['goods']:
             product, _ = Product.objects.get_or_create(name=goods['name'], category_id=goods['category'])
             product_info = ProductInfo.objects.create(product=product,
@@ -387,8 +410,6 @@ class ProductUploadFile(APIView):
                 for name, value in goods['parameters'].items():
                     parameter_object, _ = Parameter.objects.get_or_create(name=name)
                     ProductParameter.objects.update_or_create(product_info_id=product_info.id,
-                                                                parameter_id=parameter_object.id,
-                                                                defaults = {'value': value})
-        return JsonResponse({'Status': 'Done'})                   
-
-           
+                                                              parameter_id=parameter_object.id,
+                                                              defaults={'value': value})
+        return JsonResponse({'Status': 'Done'})
