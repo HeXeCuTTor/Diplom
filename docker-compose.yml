@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 
 services:
   web-app:
@@ -13,10 +13,16 @@ services:
       POSTGRES_DB: "diplom_backend"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PORT: "5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", pg_isready -U admin -d new_db]
+      test: ["CMD-SHELL", pg_isready -U postgres -d diplom_backend]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

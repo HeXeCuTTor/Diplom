@@ -27,7 +27,6 @@ Content-Type: application/json
 {
 "email":"ilyavoeeewew@gmaiil.com",
 "password": "che11ckuuu"
-
 }
 
 ###
@@ -61,8 +60,6 @@ Content-Type: application/json
 "email":"ilyavoeeewew@gmaiil.com",
 "token": "7730b77f0a4475462fccf04c6979c0104e5d20094af3"
 }
-
-###
 
 ###
 

@@ -1,6 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import update_last_login
-from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -15,6 +14,7 @@ from backend.models import User, Shop, Category, Product, ProductInfo, Parameter
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
 from info import SALT, EMAIL_HOST_USER
+from backend.tasks import send_feedback_email_task
 
 # Регистрация пользователя
 class RegisterUser(APIView):
@@ -33,7 +33,7 @@ class RegisterUser(APIView):
                 user.set_password(request.data['password']+SALT)
                 user.save()
                 token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
-                send_mail("Подтверждение регистрации", f"Confirm token is {token.key}", EMAIL_HOST_USER, [user.email])
+                send_feedback_email_task.delay("Подтверждение регистрации", user.email, f"Confirm token is {token.key}")
                 return JsonResponse({'Status': True})
             else:
                 return JsonResponse({'Status': user_serializer.errors})
@@ -103,7 +103,7 @@ class RepairAccountView(APIView):
         if {'email'}.issubset(request.data):
             user = User.objects.filter(email=request.data['email']).first()
             token, _ = ResetEmailToken.objects.get_or_create(user_id=user.id)            
-            send_mail("Восстановление пароля", f"Reset password token is {token.key}", EMAIL_HOST_USER, [user.email])            
+            send_feedback_email_task.delay("Восстановление пароля", user.email, f"Reset password token is {token.key}")            
             return JsonResponse({'Status': "Token sent on your email-adress"}) 
        
     def post(self, request, *args, **kwargs):
@@ -364,7 +364,7 @@ class OrdersView(APIView):
                 order_item_serializer = OrderItemSerializer(order_item, data=request.data, partial=True)
                 if order_item_serializer.is_valid():
                     order_item_serializer.save()
-                    send_mail("Ваш заказ сформирован", f"Заказ №{order.id} сформирован", EMAIL_HOST_USER, [request.user.email])
+                    send_feedback_email_task("Ваш заказ сформирован", request.user.email, f"Заказ №{order.id} сформирован")
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': order_item_serializer.errors})
